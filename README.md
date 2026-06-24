@@ -9,8 +9,8 @@ install tools, expose host peripherals, and deliver agent skills.
 Reference a kit in your sandbox configuration using its path in this
 repository. Kits follow the [sbx mixin spec].
 
-[Docker Sandboxes]: https://docs.github.com/en/copilot/using-github-copilot/using-claude-sonnet-in-github-copilot
-[sbx mixin spec]: https://github.com/github/docker-sandboxes
+[Docker Sandboxes]: https://docs.docker.com/ai/sandboxes/
+[sbx mixin spec]: https://github.com/docker/sbx-kits-contrib/tree/main/spec
 
 ## Kits
 
