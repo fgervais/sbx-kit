@@ -1,0 +1,23 @@
+schemaVersion: "1"
+kind: mixin
+name: pyocd
+displayName: pyOCD Remote Probe
+description: >-
+  Provides access to a host debug probe served over TCP via pyOCD.
+  On the host, run: pyocd server --allow-remote
+  The agent connects using --uid=remote:$PYOCD_HOST:$PYOCD_PORT.
+
+network:
+  allowedDomains:
+    - localhost:5555
+
+environment:
+  variables:
+    PYOCD_HOST: "host.docker.internal"
+    PYOCD_PORT: "5555"
+
+commands:
+  install:
+    - command: "uv tool install pyocd"
+      user: "1000"
+      description: "Install pyocd"

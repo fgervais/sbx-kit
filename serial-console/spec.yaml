@@ -1,0 +1,37 @@
+schemaVersion: "1"
+kind: mixin
+name: serial-proxy
+displayName: Serial Port Proxy
+description: >-
+  Provides access to a host serial port proxied over TCP via socat.
+  On the host, run: socat TCP-LISTEN:8000,reuseaddr,fork FILE:/dev/ttyACM0,b115200,raw,echo=0
+  The agent connects directly to the TCP socket using pyserial.
+
+network:
+  allowedDomains:
+    - localhost:8000
+
+environment:
+  variables:
+    SERIAL_HOST: "host.docker.internal"
+    SERIAL_PORT: "8000"
+
+commands:
+  install:
+    - command: "apt-get update && apt-get install -y python3-serial"
+      user: "0"
+      description: "Install pyserial for TCP serial port access"
+
+memory: |
+  ## Serial Console Access
+
+  A host serial port is proxied over TCP via socat. Use the `serial-console` skill
+  for full usage instructions.
+
+  Quick start:
+  ```python
+  import serial
+  ser = serial.serial_for_url(f'socket://{os.environ["SERIAL_HOST"]}:{os.environ["SERIAL_PORT"]}', timeout=1)
+  ser.write(b'your command\n')
+  print(ser.readline())
+  ```
