@@ -14,6 +14,13 @@ repository. Kits follow the [sbx mixin spec].
 
 ## Kits
 
+### [skills](skills/)
+
+Delivers additional agent skills into the sandbox — no tools installed.
+Currently includes a [Bubbletea] skill for building Go TUI applications.
+
+[Bubbletea]: https://github.com/charmbracelet/bubbletea
+
 ### [pyocd](pyocd/)
 
 Installs [pyOCD] and connects to a host debug probe served over TCP via

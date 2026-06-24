@@ -1,0 +1,7 @@
+schemaVersion: "1"
+kind: mixin
+name: skills
+displayName: Agent Skills
+description: >-
+  Delivers additional agent skills into the sandbox. No tools are
+  installed — skills are delivered as files only.
