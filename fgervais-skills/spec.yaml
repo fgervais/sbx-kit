@@ -1,6 +1,6 @@
 schemaVersion: "1"
 kind: mixin
-name: skills
+name: fgervais-skills
 displayName: Agent Skills
 description: >-
   Delivers additional agent skills into the sandbox. No tools are
