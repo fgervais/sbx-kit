@@ -38,3 +38,13 @@ directly from Python — no virtual device or special drivers needed inside
 the sandbox.
 
 [pyserial]: https://pyserial.readthedocs.io
+
+### [mcp-ampy](mcp-ampy/)
+
+Connects the [Crush] agent to a [mcp-ampy] MCP server running on the host.
+Registers the `ampy` HTTP MCP in Crush, giving the agent direct access to
+a MicroPython board over serial — no serial passthrough into the sandbox
+required.
+
+[Crush]: https://github.com/charmbracelet/crush
+[mcp-ampy]: https://github.com/fgervais/mcp-ampy
