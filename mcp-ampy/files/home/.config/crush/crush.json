@@ -1,9 +1,0 @@
-{
-  "$schema": "https://charm.land/crush.json",
-  "mcp": {
-    "ampy": {
-      "type": "http",
-      "url": "http://${AMPY_HOST}:${AMPY_PORT}/mcp/"
-    }
-  }
-}

@@ -16,3 +16,20 @@ environment:
   variables:
     AMPY_HOST: "host.docker.internal"
     AMPY_PORT: "8000"
+
+commands:
+  install:
+    - command: |
+        python3 -c "
+        import json, pathlib
+        p = pathlib.Path.home() / '.config' / 'crush' / 'crush.json'
+        p.parent.mkdir(parents=True, exist_ok=True)
+        cfg = json.loads(p.read_text()) if p.exists() else {}
+        cfg.setdefault('mcp', {})['ampy'] = {
+            'type': 'http',
+            'url': 'http://\${AMPY_HOST}:\${AMPY_PORT}/mcp/'
+        }
+        p.write_text(json.dumps(cfg, indent=2))
+        "
+      user: "1000"
+      description: "Register ampy MCP in crush.json"
