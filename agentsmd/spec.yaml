@@ -1,0 +1,10 @@
+schemaVersion: "1"
+kind: mixin
+name: agentsmd
+displayName: Agent Instructions
+description: >-
+  Delivers a shared AGENTS.md with baseline agent instructions (code style,
+  ordering conventions, repository awareness, sandbox constraints, and
+  documentation authoring guidance). Symlinks Copilot's
+  copilot-instructions.md to it so both read the same source. No tools are
+  installed — files only.

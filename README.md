@@ -14,6 +14,14 @@ repository. Kits follow the [sbx mixin spec].
 
 ## Kits
 
+### [agentsmd](agentsmd/)
+
+Delivers a shared [AGENTS.md] with baseline agent instructions and symlinks
+Copilot's `copilot-instructions.md` to it, so both read the same source —
+no tools installed.
+
+[AGENTS.md]: https://agents.md/
+
 ### [fgervais-skills](fgervais-skills/)
 
 Delivers additional agent skills into the sandbox — no tools installed.
