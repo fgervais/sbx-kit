@@ -20,16 +20,16 @@ environment:
 commands:
   install:
     - command: |
-        python3 -c "
+        python3 << 'EOF'
         import json, pathlib
         p = pathlib.Path.home() / '.config' / 'crush' / 'crush.json'
         p.parent.mkdir(parents=True, exist_ok=True)
-        cfg = json.loads(p.read_text()) if p.exists() else {}
-        cfg.setdefault('mcp', {})['ampy'] = {
+        cfg = json.loads(p.read_text()) if p.exists() else {'mcp': {}}
+        cfg['mcp']['ampy'] = {
             'type': 'http',
-            'url': 'http://\${AMPY_HOST}:\${AMPY_PORT}/mcp/'
+            'url': 'http://${AMPY_HOST}:${AMPY_PORT}/mcp/'
         }
         p.write_text(json.dumps(cfg, indent=2))
-        "
+        EOF
       user: "1000"
       description: "Register ampy MCP in crush.json"
