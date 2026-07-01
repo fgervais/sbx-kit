@@ -3,8 +3,8 @@ kind: mixin
 name: mcp-ampy
 displayName: MicroPython Board (ampy MCP)
 description: >-
-  Connects the Crush agent to a mcp-ampy MCP server running on the host.
-  On the host, run: python server.py --port /dev/ttyACM0
+  Connects the Crush and OpenCode agents to a mcp-ampy MCP server running
+  on the host. On the host, run: python server.py --port /dev/ttyACM0
   See https://github.com/fgervais/mcp-ampy for setup instructions.
   The agent connects via HTTP MCP at http://$AMPY_HOST:$AMPY_PORT/mcp/.
 
@@ -33,3 +33,18 @@ commands:
         EOF
       user: "1000"
       description: "Register ampy MCP in crush.json"
+    - command: |
+        python3 << 'EOF'
+        import json, pathlib
+        p = pathlib.Path.home() / '.config' / 'opencode' / 'config.json'
+        p.parent.mkdir(parents=True, exist_ok=True)
+        cfg = json.loads(p.read_text()) if p.exists() else {'mcp': {}}
+        cfg['mcp']['ampy'] = {
+            'type': 'remote',
+            'url': 'http://${AMPY_HOST}:${AMPY_PORT}/mcp',
+            'enabled': True
+        }
+        p.write_text(json.dumps(cfg, indent=2))
+        EOF
+      user: "1000"
+      description: "Register ampy MCP in opencode config.json"
