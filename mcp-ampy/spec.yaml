@@ -41,7 +41,7 @@ commands:
         cfg = json.loads(p.read_text()) if p.exists() else {'mcp': {}}
         cfg['mcp']['ampy'] = {
             'type': 'remote',
-            'url': 'http://${AMPY_HOST}:${AMPY_PORT}/mcp',
+            'url': 'http://{env:AMPY_HOST}:{env:AMPY_PORT}/mcp',
             'enabled': True
         }
         p.write_text(json.dumps(cfg, indent=2))
