@@ -14,7 +14,7 @@ repository. Kits follow the [sbx mixin spec].
 
 ## Kits
 
-### [skills](skills/)
+### [fgervais-skills](fgervais-skills/)
 
 Delivers additional agent skills into the sandbox — no tools installed.
 Currently includes a [Bubbletea] skill for building Go TUI applications.
