@@ -1,0 +1,18 @@
+schemaVersion: "1"
+kind: mixin
+name: mcp-ampy
+displayName: MicroPython Board (ampy MCP)
+description: >-
+  Connects the Crush agent to a mcp-ampy MCP server running on the host.
+  On the host, run: python server.py --port /dev/ttyACM0
+  See https://github.com/fgervais/mcp-ampy for setup instructions.
+  The agent connects via HTTP MCP at http://$AMPY_HOST:$AMPY_PORT/mcp/.
+
+network:
+  allowedDomains:
+    - localhost:8000
+
+environment:
+  variables:
+    AMPY_HOST: "host.docker.internal"
+    AMPY_PORT: "8000"
