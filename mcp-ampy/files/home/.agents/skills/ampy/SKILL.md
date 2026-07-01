@@ -1,52 +1,25 @@
 ---
 name: ampy
 description: >-
-  Interact with a MicroPython board over serial via the ampy MCP server
-  running on the host. Use when reading, writing, or executing code on
-  a connected MicroPython device (ESP32, RP2040, STM32, etc.).
+  Interact with a MicroPython board via the ampy MCP server running on
+  the host. The MCP is registered in Crush as `ampy`.
 ---
 
 # MicroPython Board (ampy)
 
-A `mcp-ampy` MCP server running on the host exposes the connected
-MicroPython board. It is registered in Crush as the `ampy` MCP.
+## Prerequisites
 
-## Available tools
+The `mcp-ampy` server must be running on the host before using the MCP.
+If it is not running, ask the user to start it. Example using Docker:
 
-| Tool         | Description                                          |
-|--------------|------------------------------------------------------|
-| `ls`         | List files/directories on the board                  |
-| `mkdir`      | Create a directory on the board                      |
-| `rm`         | Remove a file or directory from the board            |
-| `put`        | Write a file to the board                            |
-| `get`        | Read a file from the board                           |
-| `exec`       | Execute MicroPython code (non-blocking)              |
-| `read`       | Read buffered output from the last `exec` call       |
-| `exec_stop`  | Interrupt a running `exec` and collect remaining output |
-
-## Usage patterns
-
-### List files
-
-```
-ls(directory="/", recursive=False)
+```sh
+docker run --rm -p 8000:8000 \
+  --device /dev/ttyACM0 \
+  ghcr.io/fgervais/mcp-ampy \
+  --port /dev/ttyACM0
 ```
 
-### Upload a file
-
-```
-put(filename="/main.py", content="print('hello')\n")
-```
-
-### Execute code and read output
-
-```
-exec(code="import sys; print(sys.version)")
-read(timeout=2)
-```
-
-For long-running code, call `read()` repeatedly until `done` is `true`,
-then optionally call `exec_stop()` to interrupt.
+The serial device (`/dev/ttyACM0`) and image tag may vary.
 
 ## Troubleshooting
 
