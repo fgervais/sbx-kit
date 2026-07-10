@@ -12,25 +12,23 @@ agent:
 
 network:
   serviceDomains:
-    api.anthropic.com: anthropic
-    console.anthropic.com: anthropic
-    claude.ai: anthropic
+    openrouter.ai: openrouter
   serviceAuth:
-    anthropic:
-      headerName: x-api-key
-      valueFormat: "%s"
+    openrouter:
+      headerName: Authorization
+      valueFormat: "Bearer %s"
   allowedDomains:
     - registry.npmjs.org
 
 credentials:
   sources:
-    anthropic:
+    openrouter:
       env:
-        - ANTHROPIC_API_KEY
+        - OPENROUTER_API_KEY
 
 environment:
   proxyManaged:
-    - ANTHROPIC_API_KEY
+    - OPENROUTER_API_KEY
 
 commands:
   install:

@@ -23,13 +23,15 @@ launches reuse the sandbox.
 
 ## How auth works
 
-Anthropic SDK calls inside the sandbox flow through the sandbox proxy
+`pi` reads `OPENROUTER_API_KEY` and talks to
+[OpenRouter](https://openrouter.ai) as its model provider. Calls to
+`openrouter.ai` inside the sandbox flow through the sandbox proxy
 automatically: `NODE_USE_ENV_PROXY=1` (set globally by sbx) makes
 Node.js honor `HTTP_PROXY`/`HTTPS_PROXY`, and the proxy substitutes
-the real Anthropic credentials in place of the `proxy-managed`
-sentinel that's already in the default sandbox environment. The agent
-never sees the real key.
+the real OpenRouter credentials (as an `Authorization: Bearer` header)
+in place of the `proxy-managed` sentinel that's already in the
+default sandbox environment. The agent never sees the real key.
 
 `registry.npmjs.org` is the only domain the kit adds to
-`allowedDomains` — it's needed for the install. `api.anthropic.com`
-is reached via default sandbox policy, not a kit allowlist entry.
+`allowedDomains` — it's needed for the install. `openrouter.ai` is
+reached via the kit's `serviceDomains` entry, not an allowlist entry.
