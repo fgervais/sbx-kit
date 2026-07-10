@@ -29,6 +29,14 @@ Currently includes a [Bubbletea] skill for building Go TUI applications.
 
 [Bubbletea]: https://github.com/charmbracelet/bubbletea
 
+### [pi](pi/)
+
+A standalone agent kit (`kind: agent`) for the [pi] terminal coding agent
+CLI. Installs `pi` via npm at sandbox creation time and runs it as the
+entrypoint when you attach.
+
+[pi]: https://www.npmjs.com/package/@earendil-works/pi-coding-agent
+
 ### [pyocd](pyocd/)
 
 Installs [pyOCD] and connects to a host debug probe served over TCP via
