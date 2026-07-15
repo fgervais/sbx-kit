@@ -43,3 +43,9 @@ commands:
         done
       user: "1000"
       description: "Configure npm proxy and install pi coding agent globally (with retries)"
+    - command: |
+        mkdir -p ~/.pi/agent/extensions
+        cp "$(npm root -g)/@earendil-works/pi-coding-agent/examples/extensions/question.ts" \
+          ~/.pi/agent/extensions/
+      user: "1000"
+      description: "Enable the bundled question extension for interactive user prompts"
