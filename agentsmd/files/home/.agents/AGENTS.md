@@ -11,6 +11,24 @@
 
 - Aim for 80-100 characters per line in text and code files.
 
+## Embedded Development & Remote/Network Interactions
+
+- Be cautious with iteration loops that involve embedded hardware (flashing,
+  resetting, power-cycling) or remote network interactions (APIs, servers,
+  wireless connections). Do not brute-force a change-flash-reset or
+  retry-on-failure loop.
+- Each reset of a device can pass through a transient unsafe hardware
+  configuration, or trigger a reconnection (e.g., to a wireless network).
+  Rapid disconnect/reconnect cycles can trip protections on the server side,
+  making it look like a new bug when there isn't one.
+- The same caution applies to remote APIs: repeated fast retries can trigger
+  rate limiting or other protective measures on the remote server, leaving
+  you unable to debug at all.
+- Favor thinking over retrying: design the test that gives the most signal
+  from a single attempt rather than looping through many small attempts.
+- If failures persist after a reasonable attempt, stop and brainstorm with
+  the user instead of continuing to retry.
+
 ## Git Workflow
 
 - Try to keep the commit subject line to 50 characters or fewer, and wrap
