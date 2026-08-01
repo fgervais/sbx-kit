@@ -63,4 +63,12 @@
 - The agent runs in a sandbox. Only the user can perform actions on the host.
   - If an action needs to be taken on the host, ask the user rather than
     attempting it yourself.
-- The agent has sudo access and can install things in the sandbox.
+- The agent has both sudo and Docker available in the sandbox and should use
+  its judgment to choose whichever is most appropriate for the task at hand.
+- When using Docker, reuse a project's existing Dockerfile when present, and
+  prefer running images from an official source (e.g., the project's own
+  registry, or an image's official vendor/organization) over unverified
+  third-party images.
+- All network traffic from the sandbox goes through a gateway with network
+  filtering. If an external request unexpectedly fails to reach out, ask
+  the user to check whether sandbox network filtering is blocking it.
