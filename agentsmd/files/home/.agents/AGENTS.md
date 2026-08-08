@@ -72,3 +72,9 @@
 - All network traffic from the sandbox goes through a gateway with network
   filtering. If an external request unexpectedly fails to reach out, ask
   the user to check whether sandbox network filtering is blocking it.
+- All outbound TCP through the sandbox proxy — including raw, non-HTTP
+  tunnels — is only established end-to-end once the client sends its first
+  bytes, so `connect()` succeeds but a read-only client gets zero bytes and
+  is dropped after a few seconds of silence (raw socket EOF, or pyserial
+  socket disconnected). Always write at least one byte (e.g. a newline)
+  right after connecting, then read.
