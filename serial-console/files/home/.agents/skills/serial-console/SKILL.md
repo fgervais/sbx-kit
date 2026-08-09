@@ -1,8 +1,9 @@
 ---
 name: serial-console
 description: >-
-  Access the host serial console proxied over TCP via socat. Covers
-  connecting with pyserial, reading output, and sending commands.
+  Access the host serial console proxied over TCP via socat. Covers the
+  serialcon.py bridge daemon for reading output, sending commands, and
+  waiting for expected output.
 globs:
   - "**/*.py"
 ---
@@ -10,95 +11,140 @@ globs:
 # Serial Console Access
 
 The host's serial port is bridged into the sandbox over TCP via socat. The user
-has set this up on the host before starting the sandbox. Connect to it directly
-from Python — no virtual device, no special drivers needed.
-
-## Connection
-
-The endpoint is configured via two environment variables:
+sets this up on the host before starting the sandbox. The endpoint is given by
+two environment variables:
 
 - `SERIAL_HOST` — host running the socat TCP bridge
 - `SERIAL_PORT` — TCP port socat is listening on
 
-```python
-import os
-import serial
+Use `scripts/serialcon.py` (in this skill's directory) to talk to it. Do not
+open the socket directly for normal work; see "Why a daemon" below.
 
-ser = serial.serial_for_url(
-    f'socket://{os.environ["SERIAL_HOST"]}:{os.environ["SERIAL_PORT"]}',
-    timeout=1,
-)
+## Start the bridge
+
+```bash
+scripts/serialcon.py start     # background daemon; prints its log path
+scripts/serialcon.py status    # endpoint, daemon pid, log size
 ```
 
-## Reading output
+Everything the board prints from this moment on is appended to the log, whether
+or not you are actively looking. Start the daemon once, then leave it running
+for the rest of the session.
 
-```python
-# Read one line (waits up to `timeout` seconds)
-line = ser.readline()
-print(line.decode("utf-8", errors="replace").strip())
+## Read output
 
-# Read all available output (non-blocking)
-import time
-time.sleep(0.5)
-data = ser.read(ser.in_waiting or 1)
-print(data.decode("utf-8", errors="replace"))
+```bash
+scripts/serialcon.py tail -n 40
 ```
 
-## Sending commands
+The log is a plain file, so any normal tool works on it — use the log path from
+`status` to grep it, count occurrences, or read it with the `read` tool:
 
-```python
-ser.write(b"kernel reboot\n")
+```bash
+LOG=$(scripts/serialcon.py status | awk '/^log:/ {print $2}')
+grep -c 'MPU FAULT' "$LOG"
 ```
 
-## Full read/write example
+## Send commands
 
-```python
-import os, time, serial
-
-ser = serial.serial_for_url(
-    f'socket://{os.environ["SERIAL_HOST"]}:{os.environ["SERIAL_PORT"]}',
-    timeout=2,
-)
-
-# Send a command and collect the response
-ser.write(b"shell\n")
-time.sleep(0.1)
-response = ser.read(ser.in_waiting or 1)
-print(response.decode("utf-8", errors="replace"))
-
-ser.close()
+```bash
+scripts/serialcon.py send 'kernel reboot'   # newline appended
+scripts/serialcon.py send --raw $'\x03'     # raw bytes, no newline (Ctrl-C)
 ```
 
-## Raw socket alternative
+## Wait for expected output
 
-If pyserial is not available, use the standard `socket` module:
+`wait` blocks until a string appears, and exits non-zero on timeout. Prefer it
+over `sleep`: it turns "did the board come back?" into one deterministic step
+with a real exit code, and returns as soon as the output appears.
 
-```python
-import os, socket
-
-s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-s.connect((os.environ["SERIAL_HOST"], int(os.environ["SERIAL_PORT"])))
-s.sendall(b"shell\n")
-print(s.recv(4096).decode("utf-8", errors="replace"))
-s.close()
+```bash
+scripts/serialcon.py wait 'Booting nRF Connect SDK' --timeout 20
 ```
+
+By default `wait` only considers output that arrives after it starts, so it
+cannot match a stale hit from an earlier run. Pass `--from-start` to search the
+whole log instead.
+
+A reset-and-confirm cycle, which is the common case:
+
+```bash
+scripts/serialcon.py clear                  # truncate log, so matches are fresh
+scripts/serialcon.py send 'kernel reboot'
+scripts/serialcon.py wait 'Booting nRF Connect SDK' --timeout 20
+```
+
+## Housekeeping
+
+```bash
+scripts/serialcon.py clear   # truncate the log (it grows unbounded)
+scripts/serialcon.py stop    # stop the daemon
+```
+
+When shutting down, stop before clearing. The daemon writes a final line to the
+log as it exits, so clearing first leaves that line behind in a log you meant to
+empty:
+
+```bash
+scripts/serialcon.py stop
+scripts/serialcon.py clear
+```
+
+Clearing while the daemon keeps running is fine — it appends, so it continues at
+the start of the truncated log rather than leaving a gap.
+
+Set `SERIALCON_DIR` to use a separate log and daemon, e.g. to talk to a second
+endpoint; one daemon runs per directory.
+
+## Why a daemon
+
+Three properties of this setup make one-shot `nc`/`socat`/pyserial invocations
+the wrong tool. Keep them in mind before "simplifying" this to a bare command:
+
+- **Each shell command is a separate process.** A per-command client is
+  connected only while it runs, so anything printed between commands is lost —
+  typically the boot banner, a watchdog reset, or a fault dump.
+- **The network proxy requires the client to send data first.** On a raw TCP
+  connection the proxy does not complete the tunnel until the client writes, so
+  a connection that only reads receives nothing and is dropped after a few
+  seconds. The daemon sends one byte on every connect to handle this.
+- **Only one reader may consume the stream.** The host socat bridge accepts
+  multiple connections, and a second reader silently takes part of the output.
+  The daemon keeps the single connection and accepts data to transmit over a
+  FIFO, so `send` does not open a competing one.
+
+The daemon also reconnects on its own, with exponential backoff, so a board
+reset or a restarted host bridge does not need manual intervention.
 
 ## Troubleshooting
 
-**Connection refused** — the host-side socat bridge is not running. Ask the user
-to start it on the host before retrying.
+**`send` reports the daemon is not running** — run `start` first.
 
-**No output / timeout** — the board may not be sending data. Try nudging it:
-```python
-ser.write(b"\n")
-time.sleep(0.2)
-print(ser.read(ser.in_waiting or 1))
-```
+**Connection refused in the log** — the host-side socat bridge is not running.
+Ask the user to start it on the host; the daemon keeps retrying, so it will pick
+the bridge up once it appears.
 
-**Garbled output** — baud rate mismatch between the host socat configuration and
-the board firmware. Ask the user to verify the baud rate on the host side.
+**No new output** — confirm the daemon is connected with `status`, then nudge
+the board and look again:
 
-**Test connectivity** (without pyserial):
 ```bash
-nc -zv "$SERIAL_HOST" "$SERIAL_PORT"
+scripts/serialcon.py send ''      # sends a bare newline
+scripts/serialcon.py tail -n 20
 ```
+
+**Garbled output** — baud rate mismatch between the host socat configuration
+and the board firmware. Ask the user to verify the baud rate on the host side.
+
+**Checking the bridge without the daemon** — as a last resort, to test whether
+the bridge itself is alive. Note the `sendall` before the read: it is required,
+not optional, and omitting it makes a working bridge look dead.
+
+```bash
+python3 -c 'import os, socket
+s = socket.create_connection((os.environ["SERIAL_HOST"],
+                              int(os.environ["SERIAL_PORT"])), timeout=10)
+s.sendall(b"\n")                 # REQUIRED before reading; see "Why a daemon"
+print(s.recv(4096).decode("utf-8", "replace"))'
+```
+
+Stop the daemon before running this, so the two do not compete for the stream.
