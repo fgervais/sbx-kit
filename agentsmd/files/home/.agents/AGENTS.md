@@ -6,6 +6,9 @@
   skills or documentation.
 - Prefer linking to the source repository where the information can be
   fetched when required, rather than duplicating content that may go stale.
+- When authoring a README, use the `readme` skill if it is available.
+- When updating a project, keep its README in sync with the change, including
+  new options, commands, dependencies, or behavior.
 
 ## Code & Text Style
 
