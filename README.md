@@ -25,9 +25,9 @@ no tools installed.
 ### [fgervais-skills](fgervais-skills/)
 
 Delivers additional agent skills into the sandbox — no tools installed.
-Currently includes a [Bubbletea] skill for building Go TUI applications.
+Currently includes [Zephyr] and README authoring skills.
 
-[Bubbletea]: https://github.com/charmbracelet/bubbletea
+[Zephyr]: https://www.zephyrproject.org/
 
 ### [pi](pi/)
 
