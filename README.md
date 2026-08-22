@@ -64,3 +64,8 @@ required.
 
 [Crush]: https://github.com/charmbracelet/crush
 [mcp-ampy]: https://github.com/fgervais/mcp-ampy
+
+### [sbx-kit](sbx-kit/)
+
+Installs the `sbx` CLI and the `sbx-mixin-kit` skill so the agent can
+author and validate Docker Sandboxes mixin kits.

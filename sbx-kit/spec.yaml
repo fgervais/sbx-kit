@@ -1,0 +1,11 @@
+schemaVersion: "1"
+kind: mixin
+name: sbx-mixin-kit-author
+description: >-
+  Installs the sbx CLI and the sbx-mixin-kit skill so the agent can
+  author and validate Docker Sandboxes mixin kits.
+
+commands:
+  install:
+    - command: "apt-get update && apt-get install -y docker-sbx"
+      user: "0"
