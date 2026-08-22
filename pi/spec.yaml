@@ -19,6 +19,7 @@ network:
       valueFormat: "Bearer %s"
   allowedDomains:
     - openrouter.ai:443
+    - pi.dev:443
     - registry.npmjs.org
 
 credentials:
